@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ChangeD
 import * as THREE from "three";
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {Group, LoadingManager} from 'three';
+import {animate} from "@angular/animations";
 
 @Component({
   selector: 'app-school',
@@ -31,17 +32,11 @@ export class SchoolComponent implements OnInit {
 
   @Input('farClipping') public farClippingPlane: number = 1000;
 
-  //? Helper Properties (Private Properties);
-
   private camera!: THREE.PerspectiveCamera;
 
   private get canvas(): HTMLCanvasElement {
     return this.canvasRef.nativeElement;
   }
-  private loader = new THREE.TextureLoader();
-  private geometry = new THREE.BoxGeometry(1, 1, 1);
-
-  private cube: THREE.Mesh = new THREE.Mesh(this.geometry);
 
   private renderer!: THREE.WebGLRenderer;
 
@@ -53,10 +48,12 @@ export class SchoolComponent implements OnInit {
     const objLoader = new OBJLoader();
     objLoader.setPath('/assets/');
     objLoader.load('model.obj', (object) => {
-      console.log(object);
-      this.obj = object;
-      this.scene.add(object);
-    },
+        console.log(object);
+        this.obj = object;
+        this.scene.add(object);
+
+        this.scene.scale.set(0.0005, 0.0005, 0.0005);
+      },
       function ( xhr ) {
 
         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -70,41 +67,32 @@ export class SchoolComponent implements OnInit {
   }
 
 
-  /**
-   *Animate the cube
-   *
-   * @private
-   * @memberof CubeComponent
-   */
+
+  //Animate the cube
   private animateCube() {
-    this.obj.rotation.x += this.rotationSpeedX;
-    this.obj.rotation.y += this.rotationSpeedY;
+    requestAnimationFrame( animate );
+    this.renderer.render(this.scene, this.camera);
   }
 
-  /**
-   * Create the scene
-   *
-   * @private
-   * @memberof CubeComponent
-   */
+
+//Create the scene
+
   private createScene() {
     //* Scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0000FF)
     this.loadModel();
+
     //*Camera
-    console.log("1");
     let aspectRatio = this.getAspectRatio();
-    console.log("2");
     this.camera = new THREE.PerspectiveCamera(
       this.fieldOfView,
       aspectRatio,
       this.nearClippingPlane,
       this.farClippingPlane
     )
-    console.log("3");
     this.camera.position.z = this.cameraZ;
-    console.log("4");
+    this.camera.position.setLength(300);
   }
 
   private getAspectRatio() {
@@ -113,7 +101,6 @@ export class SchoolComponent implements OnInit {
 
   private startRenderingLoop() {
     //* Renderer
-    // Use canvas element in template
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
