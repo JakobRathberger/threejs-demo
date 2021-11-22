@@ -44,6 +44,10 @@ export class SchoolComponent implements OnInit {
 
   private obj: Group;
 
+  private mouseDown: boolean = false;
+  private mouseX: number = 0;
+  private mouseY: number = 0;
+
   private loadModel(){
     const objLoader = new OBJLoader();
     objLoader.setPath('/assets/');
@@ -99,11 +103,49 @@ export class SchoolComponent implements OnInit {
     return this.canvas.clientWidth / this.canvas.clientHeight;
   }
 
+  private onMouseMove = (evt: MouseEvent) => {
+    if (!this.mouseDown) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    var deltaX = evt.clientX - this.mouseX,
+      deltaY = evt.clientY - this.mouseY;
+    this.mouseX = evt.clientX;
+    this.mouseY = evt.clientY;
+    this.rotateScene(deltaX, deltaY);
+  }
+
+  private onMouseDown = (evt: MouseEvent) => {
+    evt.preventDefault();
+
+    this.mouseDown = true;
+    this.mouseX = evt.clientX;
+    this.mouseY = evt.clientY;
+  }
+
+  private onMouseUp = (evt: MouseEvent) => {
+    evt.preventDefault();
+
+    this.mouseDown = false;
+  }
+
+  private rotateScene(deltaX: number, deltaY: number) {
+    this.scene.rotation.y += deltaX / 100;
+    this.scene.rotation.x += deltaY / 100;
+  }
+
+
   private startRenderingLoop() {
     //* Renderer
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+
+    this.canvas.addEventListener('mousemove', this.onMouseMove);
+    this.canvas.addEventListener('mousedown', this.onMouseDown);
+    this.canvas.addEventListener('mouseup', this.onMouseUp);
 
     let component: SchoolComponent = this;
     (function render() {
