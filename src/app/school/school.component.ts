@@ -3,6 +3,7 @@ import * as THREE from "three";
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {Group, LoadingManager} from 'three';
 import {animate} from "@angular/animations";
+import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader";
 
 @Component({
   selector: 'app-school',
@@ -49,25 +50,34 @@ export class SchoolComponent implements OnInit {
   private mouseY: number = 0;
 
   private loadModel(){
-    const objLoader = new OBJLoader();
-    objLoader.setPath('/assets/');
-    objLoader.load('model.obj', (object) => {
-        console.log(object);
-        this.obj = object;
-        this.scene.add(object);
 
-        this.scene.scale.set(0.0005, 0.0005, 0.0005);
-      },
-      function ( xhr ) {
+    const mtlLoader = new MTLLoader();
+    mtlLoader.setPath('/assets/');
+    mtlLoader.load('Model.mtl', (materials) => {
+      materials.preload();
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-      },
-      function ( error ) {
+      const objLoader = new OBJLoader();
+      objLoader.setMaterials(materials);
+      objLoader.setPath('/assets/');
+      objLoader.load('model.obj', (object) => {
+          console.log(object);
+          this.obj = object;
+          this.scene.add(object);
 
-        console.log( 'An error happened' );
+          this.scene.scale.set(0.0005, 0.0005, 0.0005);
+        },
+        function (xhr) {
 
-      });
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
+        },
+        function (error) {
+
+          console.log('An error happened');
+
+        });
+    });
   }
 
 
@@ -84,7 +94,7 @@ export class SchoolComponent implements OnInit {
   private createScene() {
     //* Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0000FF)
+    this.scene.background = new THREE.Color(0x1b2023)
     this.loadModel();
 
     //*Camera
@@ -131,6 +141,26 @@ export class SchoolComponent implements OnInit {
     this.mouseDown = false;
   }
 
+  private onMouseWheel = (event: WheelEvent) => {
+
+    var multi = 0.00001;
+    var max_val = 0.0010;
+    var min_val = 0.0001;
+
+    this.scene.scale.x -= event.deltaY * 0.000001;
+    this.scene.scale.y -= event.deltaY * 0.000001;
+    this.scene.scale.z -= event.deltaY * 0.000001;
+
+    this.scene.scale.x = Math.max(this.scene.scale.x, min_val);
+    this.scene.scale.y = Math.max(this.scene.scale.y, min_val);
+    this.scene.scale.z = Math.max(this.scene.scale.z, min_val);
+
+    this.scene.scale.x = Math.min(this.scene.scale.x, max_val);
+    this.scene.scale.y = Math.min(this.scene.scale.y, max_val);
+    this.scene.scale.z = Math.min(this.scene.scale.z, max_val);
+
+  }
+
   private rotateScene(deltaX: number, deltaY: number) {
     this.scene.rotation.y += deltaX / 100;
     this.scene.rotation.x += deltaY / 100;
@@ -146,6 +176,10 @@ export class SchoolComponent implements OnInit {
     this.canvas.addEventListener('mousemove', this.onMouseMove);
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mouseup', this.onMouseUp);
+
+    this.canvas.addEventListener('wheel', this.onMouseWheel);
+
+    console.log("FOV:" + this.camera.fov)
 
     let component: SchoolComponent = this;
     (function render() {
