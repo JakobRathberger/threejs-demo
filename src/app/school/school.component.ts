@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import * as THREE from "three";
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {Group, LoadingManager} from 'three';
+import {DirectionalLight, Group, HemisphereLight, LoadingManager} from 'three';
 import {animate} from "@angular/animations";
 import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader";
 
@@ -88,7 +88,31 @@ export class SchoolComponent implements OnInit {
     this.renderer.render(this.scene, this.camera);
   }
 
+  private setUpHemiLight() {
+    const hemiLight = new HemisphereLight(0xffffff, 0xffffff, 0.4);
+    hemiLight.position.set(0, 500, 0);
+    this.scene.add(hemiLight);
+  }
 
+  private setupDirLight() {
+    const dirLight = new DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(-1, 0.75, 1);
+    dirLight.position.multiplyScalar(50);
+    dirLight.name = 'dirLight';
+
+    this.scene.add(dirLight);
+
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.height = dirLight.shadow.mapSize.height = 1024 * 2;
+    const d = 300;
+    dirLight.shadow.camera.left = -d;
+    dirLight.shadow.camera.right = d;
+    dirLight.shadow.camera.top = d;
+    dirLight.shadow.camera.bottom = -d;
+
+    dirLight.shadow.camera.far = 3500;
+    dirLight.shadow.bias = -0.0001;
+  }
 //Create the scene
 
   private createScene() {
@@ -107,6 +131,8 @@ export class SchoolComponent implements OnInit {
     )
     this.camera.position.z = this.cameraZ;
     this.camera.position.setLength(300);
+    this.setUpHemiLight();
+    this.setupDirLight();
   }
 
   private getAspectRatio() {
