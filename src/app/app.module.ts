@@ -5,6 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SchoolComponent } from './school/school.component';
 
+import {MatButtonModule} from "@angular/material/button";
+
+const MaterialComponents = [
+  MatButtonModule
+]
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -12,9 +18,17 @@ import { SchoolComponent } from './school/school.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatButtonModule
   ],
+  exports: [MaterialComponents],
   providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+@NgModule({
+  imports: [MaterialComponents],
+  exports: [MaterialComponents]
+})
+export class MaterialModule { }
