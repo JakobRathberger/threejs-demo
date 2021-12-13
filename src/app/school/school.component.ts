@@ -215,8 +215,10 @@ export class SchoolComponent implements OnInit {
     }());
   }
 
-  constructor() { }
-
+  constructor() {  }
+  buttonClickEvent(buttonName: string){
+    console.log(buttonName);
+  }
   ngOnInit(): void {
 
   }
@@ -225,5 +227,4 @@ export class SchoolComponent implements OnInit {
     this.createScene();
     this.startRenderingLoop();
   }
-
 }
