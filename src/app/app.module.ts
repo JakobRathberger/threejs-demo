@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { SchoolComponent } from './school/school.component';
 
 import {MatButtonModule} from "@angular/material/button";
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 const MaterialComponents = [
   MatButtonModule
@@ -19,7 +20,8 @@ const MaterialComponents = [
   imports: [
     BrowserModule,
     AppRoutingModule,
-    MatButtonModule
+    MatButtonModule,
+    NoopAnimationsModule
   ],
   exports: [MaterialComponents],
   providers: [],

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import * as THREE from "three";
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {DirectionalLight, Group, HemisphereLight, LoadingManager} from 'three';
+import {DirectionalLight, Group, HemisphereLight, LoadingManager, Object3D} from 'three';
 import {animate} from "@angular/animations";
 import {MTLLoader} from "three/examples/jsm/loaders/MTLLoader";
 
@@ -49,6 +49,8 @@ export class SchoolComponent implements OnInit {
   private mouseX: number = 0;
   private mouseY: number = 0;
 
+  private objects: Object3D[] = []
+
   private loadModel(){
 
     const mtlLoader = new MTLLoader();
@@ -61,11 +63,13 @@ export class SchoolComponent implements OnInit {
       objLoader.setMaterials(materials);
       objLoader.setPath('/assets/');
       objLoader.load('model.obj', (object) => {
-          console.log(object);
+          //console.log(object.name);
           this.obj = object;
           this.scene.add(object);
-
-          this.scene.scale.set(0.0005, 0.0005, 0.0005);
+          for(const o of object.children) {
+            console.log(o.name);
+            this.objects.push(o);
+          }
         },
         function (xhr) {
 
@@ -77,10 +81,59 @@ export class SchoolComponent implements OnInit {
           console.log('An error happened');
 
         });
+      this.scene.scale.set(0.0005, 0.0005, 0.0005);
     });
   }
 
+  private hideCeiling(){
+    console.log("Hide Ceiling");
+    // @ts-ignore
+    this.objects.find(o => o.name === "ceiling").visible = false;
+  }
 
+  private hideSecondFloor(){
+    console.log("hideSecondFloor");
+    // @ts-ignore
+    this.objects.find(o => o.name === "second_floor").visible = false;
+    for(const o of this.objects){
+      if(o.name.startsWith('2')){
+        o.visible = false;
+      }
+    }
+  }
+
+  private hideFirstFloor(){
+    console.log("hideFirstFloor");
+    // @ts-ignore
+    this.objects.find(o => o.name === "first_floor").visible = false;
+    for(const o of this.objects){
+      if(o.name.startsWith('1')){
+        o.visible = false;
+      }
+    }
+  }
+
+  private hideGroundFloor(){
+    console.log("hideGroundFloor");
+    // @ts-ignore
+    this.objects.find(o => o.name === "ground_floor").visible = false;
+    for(const o of this.objects){
+      if(o.name.startsWith('E')){
+        o.visible = false;
+      }
+    }
+  }
+
+  private hideCellar(){
+    console.log("hideCellar");
+    // @ts-ignore
+    this.objects.find(o => o.name === "cellar").visible = false;
+    for(const o of this.objects){
+      if(o.name.startsWith('U')){
+        o.visible = false;
+      }
+    }
+  }
 
   //Animate the cube
   private animateCube() {
@@ -216,9 +269,33 @@ export class SchoolComponent implements OnInit {
   }
 
   constructor() {  }
+
+  private showAll(){
+    for(const o of this.objects){
+      o.visible = true;
+    }
+  }
+
   buttonClickEvent(buttonName: string){
     console.log(buttonName);
+    this.showAll();
+    if(buttonName == 'second_floor'){
+      this.hideCeiling();
+    } else if (buttonName == 'first_floor') {
+      this.hideCeiling();
+      this.hideSecondFloor();
+    } else if (buttonName == 'ground_floor') {
+      this.hideCeiling();
+      this.hideSecondFloor();
+      this.hideFirstFloor();
+    } else if (buttonName == 'cellar') {
+      this.hideCeiling();
+      this.hideSecondFloor();
+      this.hideFirstFloor();
+      this.hideGroundFloor();
+    }
   }
+
   ngOnInit(): void {
 
   }
