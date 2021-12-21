@@ -65,10 +65,14 @@ export class SchoolComponent implements OnInit {
       objLoader.load('model.obj', (object) => {
           //console.log(object.name);
           this.obj = object;
+
           this.scene.add(object);
           for(const o of object.children) {
             console.log(o.name);
             this.objects.push(o);
+            if(o.name == "E59"){
+              //this.scene.add(o);
+            }
           }
         },
         function (xhr) {
@@ -192,6 +196,9 @@ export class SchoolComponent implements OnInit {
     return this.canvas.clientWidth / this.canvas.clientHeight;
   }
 
+  private raycaster = new THREE.Raycaster();
+  private mouse = new THREE.Vector2();
+
   private onMouseMove = (evt: MouseEvent) => {
     if (!this.mouseDown) {
       return;
@@ -203,6 +210,8 @@ export class SchoolComponent implements OnInit {
       deltaY = evt.clientY - this.mouseY;
     this.mouseX = evt.clientX;
     this.mouseY = evt.clientY;
+    this.mouse.x = (evt.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(evt.clientY / window.innerHeight) * 2 + 1;
     this.rotateScene(deltaX, deltaY);
   }
 
@@ -212,6 +221,16 @@ export class SchoolComponent implements OnInit {
     this.mouseDown = true;
     this.mouseX = evt.clientX;
     this.mouseY = evt.clientY;
+
+    this.raycaster.setFromCamera( this.mouse, this.camera );
+
+    // calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects( this.objects, true );
+
+    for ( let i = 0; i < intersects.length; i ++ ) {
+      console.log("clicked: " + intersects[i].object.name);
+
+    }
   }
 
   private onMouseUp = (evt: MouseEvent) => {
