@@ -63,7 +63,6 @@ export class SchoolComponent implements OnInit {
       objLoader.setMaterials(materials);
       objLoader.setPath('/assets/');
       objLoader.load('model.obj', (object) => {
-          //console.log(object.name);
           this.obj = object;
 
           this.scene.add(object);
@@ -71,8 +70,8 @@ export class SchoolComponent implements OnInit {
             console.log(o.name);
             this.objects.push(o);
             if(o.name == "E59"){
-              //this.scene.add(o);
             }
+            this.hideCeiling();
           }
         },
         function (xhr) {
@@ -86,7 +85,6 @@ export class SchoolComponent implements OnInit {
 
         });
       this.scene.scale.set(0.0005, 0.0005, 0.0005);
-      //this.obj.scale.set(0.0005,0.0005,0.0005);
     });
   }
 
@@ -95,57 +93,6 @@ export class SchoolComponent implements OnInit {
     // @ts-ignore
     this.objects.find(o => o.name === "ceiling").visible = false;
   }
-
-  private hideSecondFloor(){
-    console.log("hideSecondFloor");
-    // @ts-ignore
-    this.objects.find(o => o.name === "second_floor").visible = false;
-    for(const o of this.objects){
-      if(o.name.startsWith('2')){
-        o.visible = false;
-      }
-    }
-  }
-
-  private hideFirstFloor(){
-    console.log("hideFirstFloor");
-    // @ts-ignore
-    this.objects.find(o => o.name === "first_floor").visible = false;
-    for(const o of this.objects){
-      if(o.name.startsWith('1')){
-        o.visible = false;
-      }
-    }
-  }
-
-  private hideGroundFloor(){
-    console.log("hideGroundFloor");
-    // @ts-ignore
-    this.objects.find(o => o.name === "ground_floor").visible = false;
-    for(const o of this.objects){
-      if(o.name.startsWith('E')){
-        o.visible = false;
-      }
-    }
-  }
-
-  private hideCellar(){
-    console.log("hideCellar");
-    // @ts-ignore
-    this.objects.find(o => o.name === "cellar").visible = false;
-    for(const o of this.objects){
-      if(o.name.startsWith('U')){
-        o.visible = false;
-      }
-    }
-  }
-
-  //Animate the cube
-  private animateCube() {
-    requestAnimationFrame( animate );
-    this.renderer.render(this.scene, this.camera);
-  }
-
   private setUpHemiLight() {
     const hemiLight = new HemisphereLight(0xffffff, 0xffffff, 0.4);
     hemiLight.position.set(0, 500, 0);
@@ -178,7 +125,6 @@ export class SchoolComponent implements OnInit {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x1b2023)
     this.loadModel();
-
     //*Camera
     let aspectRatio = this.getAspectRatio();
     this.camera = new THREE.PerspectiveCamera(
@@ -240,38 +186,7 @@ export class SchoolComponent implements OnInit {
     this.mouseDown = false;
   }
 
-  private onMouseWheel = (event: WheelEvent) => {
-
-    var multi = 0.00001;
-    var max_val = 0.0010;
-    var min_val = 0.0001;
-
-    //this.scene.scale.x -= event.deltaY * 0.000001;
-    //this.scene.scale.y -= event.deltaY * 0.000001;
-    //this.scene.scale.z -= event.deltaY * 0.000001;
-    this.obj.scale.x -= event.deltaY * 0.000001;
-    this.obj.scale.y -= event.deltaY * 0.000001;
-    this.obj.scale.z -= event.deltaY * 0.000001;
-
-    //this.scene.scale.x = Math.max(this.scene.scale.x, min_val);
-    //this.scene.scale.y = Math.max(this.scene.scale.y, min_val);
-    //this.scene.scale.z = Math.max(this.scene.scale.z, min_val);
-    this.obj.scale.x = Math.max(this.obj.scale.x,min_val);
-    this.obj.scale.y = Math.max(this.obj.scale.y,min_val);
-    this.obj.scale.z = Math.max(this.obj.scale.z,min_val);
-
-    //this.scene.scale.x = Math.min(this.scene.scale.x, max_val);
-    //this.scene.scale.y = Math.min(this.scene.scale.y, max_val);
-    //this.scene.scale.z = Math.min(this.scene.scale.z, max_val);
-    this.obj.scale.x = Math.min(this.obj.scale.x, max_val);
-    this.obj.scale.y = Math.min(this.obj.scale.y, max_val);
-    this.obj.scale.z = Math.min(this.obj.scale.z, max_val);
-
-  }
-
   private rotateScene(deltaX: number, deltaY: number) {
-    //this.scene.rotation.y += deltaX / 100;
-    //this.scene.rotation.x += deltaY / 100;
     this.obj.rotation.y += deltaX /100;
     this.obj.rotation.x += deltaY /100;
   }
@@ -287,45 +202,17 @@ export class SchoolComponent implements OnInit {
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mouseup', this.onMouseUp);
 
-    this.canvas.addEventListener('wheel', this.onMouseWheel);
-
     console.log("FOV:" + this.camera.fov)
 
     let component: SchoolComponent = this;
     (function render() {
       requestAnimationFrame(render);
-      component.animateCube();
       component.renderer.render(component.scene, component.camera);
     }());
   }
 
   constructor() {  }
 
-  private showAll(){
-    for(const o of this.objects){
-      o.visible = true;
-    }
-  }
-
-  buttonClickEvent(buttonName: string){
-    console.log(buttonName);
-    this.showAll();
-    if(buttonName == 'second_floor'){
-      this.hideCeiling();
-    } else if (buttonName == 'first_floor') {
-      this.hideCeiling();
-      this.hideSecondFloor();
-    } else if (buttonName == 'ground_floor') {
-      this.hideCeiling();
-      this.hideSecondFloor();
-      this.hideFirstFloor();
-    } else if (buttonName == 'cellar') {
-      this.hideCeiling();
-      this.hideSecondFloor();
-      this.hideFirstFloor();
-      this.hideGroundFloor();
-    }
-  }
 
   ngOnInit(): void {
 
