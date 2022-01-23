@@ -58,12 +58,12 @@ export class SchoolComponent implements OnInit {
       objLoader.setPath('/assets/');
       objLoader.load('model.obj', (object) => {
           this.obj = object;
-
+          this.obj.scale.set(0.0005, 0.0005, 0.0005);
           this.scene.add(object);
           for(const o of object.children) {
             this.objects.push(o);
-            this.hideCeiling();
           }
+          this.hideCeiling();
         },
         function (xhr) {
 
@@ -75,7 +75,6 @@ export class SchoolComponent implements OnInit {
           console.log('An error happened');
 
         });
-      this.scene.scale.set(0.0005, 0.0005, 0.0005);
     });
   }
 
@@ -142,7 +141,7 @@ export class SchoolComponent implements OnInit {
       return;
     }
 
-    evt.preventDefault();
+    //evt.preventDefault();
 
     var deltaX = evt.clientX - this.mouseX,
       deltaY = evt.clientY - this.mouseY;
@@ -154,11 +153,13 @@ export class SchoolComponent implements OnInit {
   }
 
   private onMouseDown = (evt: MouseEvent) => {
-    evt.preventDefault();
+    //evt.preventDefault();
 
     this.mouseDown = true;
     this.mouseX = evt.clientX;
     this.mouseY = evt.clientY;
+    this.mouse.x = (evt.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(evt.clientY / window.innerHeight) * 2 + 1;
 
     this.raycaster.setFromCamera( this.mouse, this.camera );
 
@@ -174,7 +175,7 @@ export class SchoolComponent implements OnInit {
   }
 
   private onMouseUp = (evt: MouseEvent) => {
-    evt.preventDefault();
+    //evt.preventDefault();
 
     this.mouseDown = false;
   }
@@ -189,7 +190,7 @@ export class SchoolComponent implements OnInit {
     //* Renderer
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
     this.renderer.setPixelRatio(devicePixelRatio);
-    this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+    //this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
 
     this.canvas.addEventListener('mousemove', this.onMouseMove);
     this.canvas.addEventListener('mousedown', this.onMouseDown);
