@@ -15,12 +15,6 @@ export class SchoolComponent implements OnInit {
   @ViewChild('canvas')
   private canvasRef: ElementRef;
 
-  //* Cube Properties
-
-  @Input() public rotationSpeedX: number = 0.05;
-
-  @Input() public rotationSpeedY: number = 0.01;
-
   @Input() public size: number = 200;
 
   //* Stage Properties
@@ -69,8 +63,6 @@ export class SchoolComponent implements OnInit {
           for(const o of object.children) {
             console.log(o.name);
             this.objects.push(o);
-            if(o.name == "E59"){
-            }
             this.hideCeiling();
           }
         },
@@ -176,7 +168,6 @@ export class SchoolComponent implements OnInit {
 
     for ( let i = 0; i < intersects.length; i ++ ) {
       console.log("clicked: " + intersects[i].object.name);
-
     }
   }
 
