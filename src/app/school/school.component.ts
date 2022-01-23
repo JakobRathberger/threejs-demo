@@ -61,7 +61,6 @@ export class SchoolComponent implements OnInit {
 
           this.scene.add(object);
           for(const o of object.children) {
-            console.log(o.name);
             this.objects.push(o);
             this.hideCeiling();
           }
@@ -167,7 +166,10 @@ export class SchoolComponent implements OnInit {
     const intersects = this.raycaster.intersectObjects( this.objects, true );
 
     for ( let i = 0; i < intersects.length; i ++ ) {
-      console.log("clicked: " + intersects[i].object.name);
+      let tmp_obj = intersects[i].object;
+      if(tmp_obj.name.startsWith('2')){
+        console.log("clicked: " + tmp_obj.name);
+      }
     }
   }
 
