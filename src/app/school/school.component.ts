@@ -45,6 +45,8 @@ export class SchoolComponent implements OnInit {
 
   private objects: Object3D[] = []
 
+  private lastSelected: string = '2';
+
   private loadModel(){
 
     const mtlLoader = new MTLLoader();
@@ -78,12 +80,14 @@ export class SchoolComponent implements OnInit {
   }
 
   private hideCeiling(){
+    this.lastSelected = '2';
     console.log("Hide Ceiling");
     // @ts-ignore
     this.objects.find(o => o.name === "ceiling").visible = false;
   }
 
   private hideSecondFloor(){
+    this.lastSelected = '1';
     console.log("hideSecondFloor");
     // @ts-ignore
     this.objects.find(o => o.name === "second_floor").visible = false;
@@ -95,6 +99,7 @@ export class SchoolComponent implements OnInit {
   }
 
   private hideFirstFloor(){
+    this.lastSelected = 'E';
     console.log("hideFirstFloor");
     // @ts-ignore
     this.objects.find(o => o.name === "first_floor").visible = false;
@@ -106,6 +111,7 @@ export class SchoolComponent implements OnInit {
   }
 
   private hideGroundFloor(){
+    this.lastSelected = 'U';
     console.log("hideGroundFloor");
     // @ts-ignore
     this.objects.find(o => o.name === "ground_floor").visible = false;
@@ -218,7 +224,7 @@ export class SchoolComponent implements OnInit {
 
     for ( let i = 0; i < intersects.length; i ++ ) {
       let tmp_obj = intersects[i].object;
-      if(tmp_obj.name.startsWith('2')){
+      if(tmp_obj.name.startsWith(this.lastSelected)){
         console.log("clicked: " + tmp_obj.name);
       }
     }
