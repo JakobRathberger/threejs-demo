@@ -15,12 +15,6 @@ export class SchoolComponent implements OnInit {
   @ViewChild('canvas')
   private canvasRef: ElementRef;
 
-  //* Cube Properties
-
-  @Input() public rotationSpeedX: number = 0.05;
-
-  @Input() public rotationSpeedY: number = 0.01;
-
   @Input() public size: number = 200;
 
   //* Stage Properties
@@ -63,16 +57,11 @@ export class SchoolComponent implements OnInit {
       objLoader.setMaterials(materials);
       objLoader.setPath('/assets/');
       objLoader.load('model.obj', (object) => {
-          //console.log(object.name);
           this.obj = object;
-
+          this.obj.scale.set(0.0005, 0.0005, 0.0005);
           this.scene.add(object);
           for(const o of object.children) {
-            console.log(o.name);
             this.objects.push(o);
-            if(o.name == "E59"){
-              //this.scene.add(o);
-            }
           }
         },
         function (xhr) {
@@ -85,7 +74,6 @@ export class SchoolComponent implements OnInit {
           console.log('An error happened');
 
         });
-      this.scene.scale.set(0.0005, 0.0005, 0.0005);
     });
   }
 
@@ -177,7 +165,6 @@ export class SchoolComponent implements OnInit {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x1b2023)
     this.loadModel();
-
     //*Camera
     let aspectRatio = this.getAspectRatio();
     this.camera = new THREE.PerspectiveCamera(
@@ -204,7 +191,7 @@ export class SchoolComponent implements OnInit {
       return;
     }
 
-    evt.preventDefault();
+    //evt.preventDefault();
 
     var deltaX = evt.clientX - this.mouseX,
       deltaY = evt.clientY - this.mouseY;
@@ -216,11 +203,13 @@ export class SchoolComponent implements OnInit {
   }
 
   private onMouseDown = (evt: MouseEvent) => {
-    evt.preventDefault();
+    //evt.preventDefault();
 
     this.mouseDown = true;
     this.mouseX = evt.clientX;
     this.mouseY = evt.clientY;
+    this.mouse.x = (evt.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(evt.clientY / window.innerHeight) * 2 + 1;
 
     this.raycaster.setFromCamera( this.mouse, this.camera );
 
@@ -228,13 +217,15 @@ export class SchoolComponent implements OnInit {
     const intersects = this.raycaster.intersectObjects( this.objects, true );
 
     for ( let i = 0; i < intersects.length; i ++ ) {
-      console.log("clicked: " + intersects[i].object.name);
-
+      let tmp_obj = intersects[i].object;
+      if(tmp_obj.name.startsWith('2')){
+        console.log("clicked: " + tmp_obj.name);
+      }
     }
   }
 
   private onMouseUp = (evt: MouseEvent) => {
-    evt.preventDefault();
+    //evt.preventDefault();
 
     this.mouseDown = false;
   }
@@ -245,23 +236,23 @@ export class SchoolComponent implements OnInit {
     var max_val = 0.0010;
     var min_val = 0.0001;
 
-    this.scene.scale.x -= event.deltaY * 0.000001;
-    this.scene.scale.y -= event.deltaY * 0.000001;
-    this.scene.scale.z -= event.deltaY * 0.000001;
+    this.obj.scale.x -= event.deltaY * 0.000001;
+    this.obj.scale.y -= event.deltaY * 0.000001;
+    this.obj.scale.z -= event.deltaY * 0.000001;
 
-    this.scene.scale.x = Math.max(this.scene.scale.x, min_val);
-    this.scene.scale.y = Math.max(this.scene.scale.y, min_val);
-    this.scene.scale.z = Math.max(this.scene.scale.z, min_val);
+    this.obj.scale.x = Math.max(this.obj.scale.x,min_val);
+    this.obj.scale.y = Math.max(this.obj.scale.y,min_val);
+    this.obj.scale.z = Math.max(this.obj.scale.z,min_val);
 
-    this.scene.scale.x = Math.min(this.scene.scale.x, max_val);
-    this.scene.scale.y = Math.min(this.scene.scale.y, max_val);
-    this.scene.scale.z = Math.min(this.scene.scale.z, max_val);
+    this.obj.scale.x = Math.min(this.obj.scale.x, max_val);
+    this.obj.scale.y = Math.min(this.obj.scale.y, max_val);
+    this.obj.scale.z = Math.min(this.obj.scale.z, max_val);
 
   }
 
   private rotateScene(deltaX: number, deltaY: number) {
-    this.scene.rotation.y += deltaX / 100;
-    this.scene.rotation.x += deltaY / 100;
+    this.obj.rotation.y += deltaX /100;
+    this.obj.rotation.x += deltaY /100;
   }
 
 
@@ -274,7 +265,6 @@ export class SchoolComponent implements OnInit {
     this.canvas.addEventListener('mousemove', this.onMouseMove);
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mouseup', this.onMouseUp);
-
     this.canvas.addEventListener('wheel', this.onMouseWheel);
 
     console.log("FOV:" + this.camera.fov)
